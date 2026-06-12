@@ -1,0 +1,410 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "bucketCount": 50,
+        "combine": false,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "P8B9C0A7F6E5D4C3"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT score FROM scores WHERE $__timeFilter(created_at) AND ('$us_state' = '.*' OR us_state = '$us_state') AND ('$merch' = '.*' OR merch = '$merch')",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "type": "number",
+                "name": "score"
+              }
+            ],
+            "groupBy": [],
+            "limit": 0
+          }
+        }
+      ],
+      "title": "Плотность распределения скоров",
+      "type": "histogram"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(transactions_total{us_state=~\"$us_state\", merch=~\"$merch\"}[$__rate_interval]))",
+          "instant": false,
+          "legendFormat": "TPS",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "TPS обработки транзакций",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 3,
+      "options": {
+        "barRadius": 4,
+        "barWidth": 0.8,
+        "colorByField": "fraud_rate",
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.5.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "P8B9C0A7F6E5D4C3"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT cat_id, AVG(fraud_flag::float) AS fraud_rate FROM (SELECT cat_id, fraud_flag FROM scores ORDER BY created_at DESC LIMIT 1000) t GROUP BY cat_id ORDER BY fraud_rate DESC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "type": "text",
+                "name": "cat_id"
+              },
+              {
+                "type": "number",
+                "name": "fraud_rate"
+              }
+            ],
+            "groupBy": [],
+            "limit": 0
+          }
+        }
+      ],
+      "title": "Средняя доля фродовых транзакций по категории продукта (последние 1000)",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.2
+              },
+              {
+                "color": "red",
+                "value": 0.4
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 4,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "11.5.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "fraud_ratio",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Доля мошеннических транзакций",
+      "type": "gauge"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "fraud",
+    "ml"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "P8B9C0A7F6E5D4C3"
+        },
+        "definition": "SELECT DISTINCT us_state FROM scores WHERE us_state IS NOT NULL AND us_state != '' ORDER BY us_state",
+        "includeAll": true,
+        "label": "Штат (us_state)",
+        "name": "us_state",
+        "options": [],
+        "query": "SELECT DISTINCT us_state FROM scores WHERE us_state IS NOT NULL AND us_state != '' ORDER BY us_state",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "P8B9C0A7F6E5D4C3"
+        },
+        "definition": "SELECT DISTINCT merch FROM scores WHERE merch IS NOT NULL AND merch != '' ORDER BY merch",
+        "includeAll": true,
+        "label": "Мерчендайзер (merch)",
+        "name": "merch",
+        "options": [],
+        "query": "SELECT DISTINCT merch FROM scores WHERE merch IS NOT NULL AND merch != '' ORDER BY merch",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Fraud Detection Dashboard",
+  "uid": "fraud-detection",
+  "version": 1,
+  "weekStart": ""
+}
