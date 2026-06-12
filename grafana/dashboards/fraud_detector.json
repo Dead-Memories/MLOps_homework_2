@@ -11,7 +11,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres"
+        "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
       },
       "fieldConfig": {
         "defaults": {
@@ -44,7 +45,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres"
+            "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
           },
           "editorMode": "code",
           "format": "table",
@@ -57,7 +59,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
@@ -116,7 +119,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
           "expr": "sum(rate(transactions_total{us_state=~\"$us_state\", merch=~\"$merch\"}[$__rate_interval]))",
@@ -131,7 +135,8 @@
     },
     {
       "datasource": {
-        "type": "postgres"
+        "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
       },
       "fieldConfig": {
         "defaults": {
@@ -188,7 +193,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres"
+            "type": "postgres",
+        "uid": "P8B9C0A7F6E5D4C3"
           },
           "editorMode": "code",
           "format": "table",
@@ -201,7 +207,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
@@ -250,7 +257,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
           "expr": "fraud_ratio",
@@ -280,7 +288,8 @@
           "value": ".*"
         },
         "datasource": {
-          "type": "prometheus"
+          "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
         },
         "definition": "label_values(transactions_total, us_state)",
         "includeAll": true,
@@ -300,7 +309,8 @@
           "value": ".*"
         },
         "datasource": {
-          "type": "prometheus"
+          "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
         },
         "definition": "label_values(transactions_total, merch)",
         "includeAll": true,
