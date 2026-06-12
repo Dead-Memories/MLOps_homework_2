@@ -6,10 +6,10 @@ datasources:
     uid: P8B9C0A7F6E5D4C3
     access: proxy
     url: postgres:5432
-    database: fraud_db
-    user: fraud_user
+    database: ${POSTGRES_DB}
+    user: ${POSTGRES_USER}
     secureJsonData:
-      password: fraud_pass
+      password: ${POSTGRES_PASSWORD}
     jsonData:
       sslmode: disable
       postgresVersion: 1500
