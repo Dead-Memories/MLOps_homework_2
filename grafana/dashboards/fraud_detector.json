@@ -11,8 +11,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "P8B9C0A7F6E5D4C3"
+        "type": "postgres"
       },
       "fieldConfig": {
         "defaults": {
@@ -20,16 +19,6 @@
             "fillOpacity": 80,
             "lineWidth": 1,
             "spanNulls": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
           },
           "unit": "none"
         },
@@ -50,33 +39,17 @@
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
         }
       },
-      "pluginVersion": "11.5.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "P8B9C0A7F6E5D4C3"
+            "type": "postgres"
           },
           "editorMode": "code",
           "format": "table",
           "rawSql": "SELECT score FROM scores WHERE $__timeFilter(created_at) AND ('$us_state' = '.*' OR us_state = '$us_state') AND ('$merch' = '.*' OR merch = '$merch')",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "type": "number",
-                "name": "score"
-              }
-            ],
-            "groupBy": [],
-            "limit": 0
-          }
+          "refId": "A"
         }
       ],
       "title": "Плотность распределения скоров",
@@ -84,8 +57,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -122,16 +94,6 @@
               "mode": "off"
             }
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
           "unit": "reqps"
         },
         "overrides": []
@@ -149,17 +111,12 @@
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
         }
       },
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(transactions_total{us_state=~\"$us_state\", merch=~\"$merch\"}[$__rate_interval]))",
@@ -174,8 +131,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "P8B9C0A7F6E5D4C3"
+        "type": "postgres"
       },
       "fieldConfig": {
         "defaults": {
@@ -194,23 +150,7 @@
               "tooltip": false,
               "viz": false
             },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
+            "lineWidth": 1
           },
           "unit": "percentunit"
         },
@@ -245,31 +185,15 @@
         "xTickLabelRotation": -45,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "11.5.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "P8B9C0A7F6E5D4C3"
+            "type": "postgres"
           },
           "editorMode": "code",
           "format": "table",
           "rawSql": "SELECT cat_id, AVG(fraud_flag::float) AS fraud_rate FROM (SELECT cat_id, fraud_flag FROM scores ORDER BY created_at DESC LIMIT 1000) t GROUP BY cat_id ORDER BY fraud_rate DESC",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "type": "text",
-                "name": "cat_id"
-              },
-              {
-                "type": "number",
-                "name": "fraud_rate"
-              }
-            ],
-            "groupBy": [],
-            "limit": 0
-          }
+          "refId": "A"
         }
       ],
       "title": "Средняя доля фродовых транзакций по категории продукта (последние 1000)",
@@ -277,15 +201,13 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -325,12 +247,10 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "11.5.0",
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "fraud_ratio",
@@ -360,15 +280,14 @@
           "value": ".*"
         },
         "datasource": {
-          "type": "postgres",
-          "uid": "P8B9C0A7F6E5D4C3"
+          "type": "prometheus"
         },
-        "definition": "SELECT DISTINCT us_state FROM scores WHERE us_state IS NOT NULL AND us_state != '' ORDER BY us_state",
+        "definition": "label_values(transactions_total, us_state)",
         "includeAll": true,
         "label": "Штат (us_state)",
         "name": "us_state",
         "options": [],
-        "query": "SELECT DISTINCT us_state FROM scores WHERE us_state IS NOT NULL AND us_state != '' ORDER BY us_state",
+        "query": "label_values(transactions_total, us_state)",
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -381,15 +300,14 @@
           "value": ".*"
         },
         "datasource": {
-          "type": "postgres",
-          "uid": "P8B9C0A7F6E5D4C3"
+          "type": "prometheus"
         },
-        "definition": "SELECT DISTINCT merch FROM scores WHERE merch IS NOT NULL AND merch != '' ORDER BY merch",
+        "definition": "label_values(transactions_total, merch)",
         "includeAll": true,
         "label": "Мерчендайзер (merch)",
         "name": "merch",
         "options": [],
-        "query": "SELECT DISTINCT merch FROM scores WHERE merch IS NOT NULL AND merch != '' ORDER BY merch",
+        "query": "label_values(transactions_total, merch)",
         "refresh": 1,
         "regex": "",
         "sort": 1,
