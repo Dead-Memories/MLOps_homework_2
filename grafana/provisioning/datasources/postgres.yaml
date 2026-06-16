@@ -13,3 +13,4 @@ datasources:
     jsonData:
       sslmode: disable
       postgresVersion: 1500
+      database: fraud_db
