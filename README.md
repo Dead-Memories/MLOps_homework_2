@@ -1,130 +1,81 @@
-# MLOps HW2 — Real-time Fraud Detection Service
+# MLOps HW2 — Realtime Fraud Detection
 
-Сервис потокового обнаружения мошеннических транзакций на базе Kafka, CatBoost, PostgreSQL, Streamlit, Prometheus и Grafana.
+Сервис для потокового детекта фродовых транзакций. Данные идут через Kafka, модель — CatBoost из соревнования [TETA ML 1 2025](https://www.kaggle.com/competitions/teta-ml-1-2025). Визуализация в Streamlit и Grafana, метрики в Prometheus, результаты в PostgreSQL.
 
-Модель и препроцессинг — из соревнования [TETA ML 1 2025](https://www.kaggle.com/competitions/teta-ml-1-2025).
+## Что внутри
 
----
+Поднимается 10 контейнеров:
+- **Zookeeper** и **Kafka** — брокер сообщений, два топика: `transactions` (вход) и `scoring` (выход)
+- **Kafka UI** на порту 8080 — посмотреть, что в топиках
+- **fraud_detector** — читает транзакции из Kafka, делает препроцессинг и инференс CatBoost, пишет скоры обратно в Kafka. Отдаёт метрики на порт 8000
+- **scoring_writer** — читает топик `scoring`, складывает результаты в PostgreSQL. Отдаёт метрики на порт 8001
+- **PostgreSQL** — хранит таблицу `scores`
+- **interface** — Streamlit на порту 8501. Загружаешь CSV, отправляешь в Kafka, смотришь результаты из базы
+- **Prometheus** на порту 9090 — собирает метрики с fraud_detector, scoring_writer и node-exporter
+- **Grafana** на порту 3000 (логин/пароль: admin/admin) — дашборды с фильтрами
+- **Node Exporter** — системные метрики (CPU, RAM)
 
-## Архитектура
-
-| Сервис           | Описание |
-|------------------|----------|
-| **Kafka**        | Шина сообщений для потоковой передачи транзакций |
-| **Zookeeper**    | Координация кластера Kafka |
-| **Kafka UI**     | Веб-интерфейс мониторинга Kafka (http://localhost:8080) |
-| **fraud_detector** | Чтение из `transactions`, препроцессинг (MLOps 1), инференс CatBoost, запись в `scoring` |
-| **scoring_writer** | Чтение `scoring`, сохранение результатов в PostgreSQL, экспорт Prometheus-метрик |
-| **PostgreSQL**   | Хранилище результатов скоринга (таблица `scores`) |
-| **interface**    | Streamlit UI для загрузки CSV и просмотра результатов (http://localhost:8501) |
-| **Prometheus**   | Сбор метрик (http://localhost:9090) |
-| **Grafana**      | Дашборды с фильтрами по `us_state`, `merch` и barplot по `cat_id` (http://localhost:3000) |
-| **Node Exporter**| Системные метрики (CPU, RAM, диск, сеть) |
-
----
-
-## Структура проекта
+## Структура
 
 ```
-├── docker-compose.yaml
-├── .env.example
-├── README.md
-├── fraud_detector/           # Сервис инференса
-│   ├── app/app.py            # Kafka-consumer + пайплайн
-│   ├── src/preprocessing.py  # Препроцессинг (train.csv + маппинги)
-│   ├── src/scorer.py         # Инференс CatBoost
-│   ├── models/fraud_model.cbm
-│   ├── train_data/train.csv
-│   ├── Dockerfile
-│   └── requirements.txt
-├── scoring_writer/           # Запись результатов в PostgreSQL
-│   ├── app.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── interface/                # Streamlit UI
-│   ├── app.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── prometheus/
-│   └── prometheus.yml
-└── grafana/
-    ├── provisioning/
-    │   ├── dashboards/dashboards.yaml
-    │   └── datasources/
-    │       ├── prometheus.yaml
-    │       └── postgres.yaml
-    └── dashboards/
-        ├── fraud_detector.json
-        ├── scoring.json
-        └── node_exporter.json
+fraud_detector/
+  app/app.py            - читает Kafka, запускает пайплайн
+  src/preprocessing.py  - препроцессинг на основе train.csv
+  src/scorer.py         - CatBoost инференс
+  models/               - сохранённая модель
+  train_data/           - сюда класть train.csv
+scoring_writer/
+  app.py                - читает scoring-топик, пишет в БД, экспортит метрики
+interface/
+  app.py                - Streamlit UI
+prometheus/
+  prometheus.yml        - конфиг сбора метрик
+grafana/
+  provisioning/         - автонастройка датасорсов и дашбордов
+  dashboards/           - JSON-дашборды
+docker-compose.yaml
+.env.example
 ```
 
----
+## Запуск
 
-## Как запустить
+Скопировать .env:
 
-### 1. Скопируйте .env
-
-```bash
+```
 cp .env.example .env
 ```
 
-### 2. Скачайте train.csv
+Скачать `train.csv` из [соревнования](https://www.kaggle.com/competitions/teta-ml-1-2025/data) и положить в `fraud_detector/train_data/train.csv`.
 
-Скачайте `train.csv` из [соревнования TETA ML 1 2025](https://www.kaggle.com/competitions/teta-ml-1-2025/data) и поместите в `fraud_detector/train_data/train.csv`.
+Запуск:
 
-### 3. Запустите контейнеры
-
-```bash
+```
 docker-compose up --build
 ```
 
-Первый запуск займёт несколько минут на сборку образов и скачивание.
+## Как пользоваться
 
-### 4. Откройте интерфейсы
+1. Открыть http://localhost:8501
+2. Загрузить CSV (формат как test.csv из соревнования)
+3. Нажать «Отправить» — транзакции уходят в Kafka
+4. Нажать «Посмотреть результаты» — сервис показывает последние 10 фродовых транзакций и гистограмму скоров за последние 100 записей
 
-| Сервис         | URL                     | Логин/пароль   |
-|----------------|-------------------------|----------------|
-| Streamlit UI   | http://localhost:8501   | —              |
-| Kafka UI       | http://localhost:8080   | —              |
-| Grafana        | http://localhost:3000   | admin / admin  |
-| Prometheus     | http://localhost:9090   | —              |
+В Grafana (http://localhost:3000, логин/пароль admin/admin) дашборд **Fraud Detection Dashboard**:
+- Плотность распределения скоров
+- TPS обработки транзакций
+- Средняя доля фрода по категории продукта (последние 1000)
+- Gauge доли фрода
 
----
+На двух первых графиках работают фильтры по штату и мерчендайзеру — выпадающие списки сверху дашборда.
 
-## Как использовать
+## Таблица scores
 
-1. Перейдите в **Streamlit UI** (http://localhost:8501).
-2. Загрузите CSV-файл с транзакциями (формат test.csv соревнования).
-3. Нажмите **«Отправить»** — данные уйдут в Kafka.
-4. Нажмите **«Посмотреть результаты»**:
-   - Таблица последних 10 фродовых транзакций (`fraud_flag == 1`).
-   - Гистограмма распределения скоров последних 100 транзакций.
-5. Откройте **Grafana** (http://localhost:3000) → **Fraud Detection Dashboard**:
-   - **Плотность распределения скоров** — фильтры по штату (`us_state`) и мерчендайзеру (`merch`).
-   - **TPS обработки транзакций** — с теми же фильтрами.
-   - **Barplot средней доли фрода по категории продукта (`cat_id`)** за последние 1000 транзакций.
-   - **Gauge доли мошеннических транзакций**.
+Поля: id, transaction_id, score, fraud_flag, us_state, merch, cat_id, created_at.
 
----
+fraud_flag считается так: если score > 0.5, то 1 (фрод), иначе 0.
 
-## Таблица `scores` (PostgreSQL)
+## Остановка
 
-| Поле           | Тип       | Описание                           |
-|----------------|-----------|------------------------------------|
-| id             | SERIAL    | PK                                |
-| transaction_id | TEXT      | UUID транзакции                    |
-| score          | FLOAT     | Вероятность фрода (0..1)           |
-| fraud_flag     | INT       | 1 — фрод, 0 — нормально (порог 0.5)|
-| us_state       | TEXT      | Штат                               |
-| merch          | TEXT      | Мерчендайзер                       |
-| cat_id         | TEXT      | Категория продукта                 |
-| created_at     | TIMESTAMP | Время записи                       |
-
----
-
-## Остановка и очистка
-
-```bash
+```
 docker-compose down -v
 ```
